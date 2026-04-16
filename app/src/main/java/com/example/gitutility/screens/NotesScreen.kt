@@ -54,6 +54,7 @@ import com.example.gitutility.viewmodel.NotesViewModel
 fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
     val notes by viewModel.notes.collectAsState()
     val isAddingNote by viewModel.isAddingNote.collectAsState()
+    val editingNote by viewModel.editingNote.collectAsState()
 
     Column(
         modifier = Modifier
@@ -107,7 +108,8 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
                 items(notes) { note ->
                     NoteCard(
                         note = note,
-                        onDelete = { viewModel.deleteNote(note) }
+                        onDelete = { viewModel.deleteNote(note) },
+                        onClick = { viewModel.onNoteClick(note) }
                     )
                 }
             }
@@ -115,10 +117,21 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
     }
 
     if (isAddingNote) {
-        AddNoteDialog(
+        NoteDialog(
             onDismiss = { viewModel.onDismissDialog() },
             onSave = { title, content ->
                 viewModel.saveNote(title, content)
+            }
+        )
+    }
+
+    editingNote?.let { note ->
+        NoteDialog(
+            initialTitle = note.title,
+            initialContent = note.content,
+            onDismiss = { viewModel.onDismissDialog() },
+            onSave = { title, content ->
+                viewModel.updateNote(note, title, content)
             }
         )
     }
@@ -127,10 +140,13 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
 @Composable
 fun NoteCard(
     note: Note,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
@@ -178,12 +194,14 @@ fun NoteCard(
 }
 
 @Composable
-fun AddNoteDialog(
+fun NoteDialog(
+    initialTitle: String = "",
+    initialContent: String = "",
     onDismiss: () -> Unit,
     onSave: (String, String) -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
-    var content by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf(initialTitle) }
+    var content by remember { mutableStateOf(initialContent) }
 
     Dialog(
         onDismissRequest = onDismiss,

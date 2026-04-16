@@ -26,12 +26,20 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
     private val _isAddingNote = MutableStateFlow(false)
     val isAddingNote = _isAddingNote.asStateFlow()
 
+    private val _editingNote = MutableStateFlow<Note?>(null)
+    val editingNote = _editingNote.asStateFlow()
+
     fun onAddNoteClick() {
         _isAddingNote.value = true
     }
 
     fun onDismissDialog() {
         _isAddingNote.value = false
+        _editingNote.value = null
+    }
+
+    fun onNoteClick(note: Note) {
+        _editingNote.value = note
     }
 
     fun saveNote(title: String, content: String, color: Int = 0) {
@@ -45,6 +53,21 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
             )
             repository.insertNote(newNote)
             _isAddingNote.value = false
+        }
+    }
+
+    fun updateNote(note: Note, title: String, content: String, color: Int = 0) {
+        if (title.isBlank() && content.isBlank()) return
+        
+        viewModelScope.launch {
+            val updatedNote = note.copy(
+                title = title,
+                content = content,
+                color = color,
+                timestamp = System.currentTimeMillis()
+            )
+            repository.updateNote(updatedNote)
+            _editingNote.value = null
         }
     }
 

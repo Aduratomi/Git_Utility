@@ -14,16 +14,21 @@ import kotlinx.coroutines.launch
 class TimerViewModel : ViewModel() {
     var stopwatchTime by mutableLongStateOf(0L)
         private set
+    
     var isStopwatchRunning by mutableStateOf(false)
         private set
+    
     private var stopwatchJob: Job? = null
 
     var timerTime by mutableLongStateOf(0L) 
         private set
+    
     var initialTimerTime by mutableLongStateOf(0L)
         private set
+    
     var isTimerRunning by mutableStateOf(false)
         private set
+    
     private var timerJob: Job? = null
 
     fun startStopwatch() {

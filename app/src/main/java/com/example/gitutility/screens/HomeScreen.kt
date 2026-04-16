@@ -40,7 +40,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,12 +52,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gitutility.components.GlassCard
+import com.example.gitutility.viewmodel.TaskViewModel
 
 sealed class NavItem(val title: String, val icon: ImageVector, val index: Int) {
     object Home : NavItem("Home", Icons.Default.Home, 0)
     object Convert : NavItem("Convert", Icons.Default.CurrencyExchange, 1)
     object Calculator : NavItem("Calculator", Icons.Default.Calculate, 2)
-    object Notes : NavItem("Notes", Icons.AutoMirrored.Filled.Notes, 3)
+    object Notes : NavItem("Notes & Tasks", Icons.AutoMirrored.Filled.Notes, 3)
     object Timer : NavItem("Timer", Icons.Default.Timer, 4)
 }
 
@@ -67,6 +67,7 @@ sealed class NavItem(val title: String, val icon: ImageVector, val index: Int) {
 fun MainScreen() {
     var selectedNavItem by rememberSaveable { mutableIntStateOf(0) }
     var selectedConvertTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var selectedNoteTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
     val navItems = listOf(
         NavItem.Home,
@@ -109,7 +110,7 @@ fun MainScreen() {
                                     0 -> "Smart Toolkit"
                                     1 -> "Converter"
                                     2 -> "Calculator"
-                                    3 -> "Notes"
+                                    3 -> "Notes & Tasks"
                                     4 -> "Timer & Stopwatch"
                                     else -> "Utilities"
                                 },
@@ -147,12 +148,15 @@ fun MainScreen() {
                             onNavigateToNotes = { selectedNavItem = 3 },
                             onNavigateToTimer = { selectedNavItem = 4 }
                         )
-                        1 -> ConvertSection(
+                        1 -> ConverterConvertSection(
                             selectedTabIndex = selectedConvertTabIndex,
                             onTabSelected = { selectedConvertTabIndex = it }
                         )
                         2 -> CalculatorScreen(viewModel())
-                        3 -> NotesScreen(viewModel())
+                        3 -> NoteConvertSection(
+                            selectedTabIndex = selectedNoteTabIndex,
+                            onTabSelected = { selectedNoteTabIndex = it }
+                        )
                         4 -> TimerScreen(viewModel())
                     }
                 }
@@ -162,7 +166,7 @@ fun MainScreen() {
 }
 
 @Composable
-fun ConvertSection(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
+fun ConverterConvertSection(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     val tabs = listOf("Units", "Currency", "Temperature")
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -201,6 +205,44 @@ fun ConvertSection(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
 }
 
 @Composable
+fun NoteConvertSection(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
+    val tabbs = listOf("Notes", "Tasks")
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        TabRow(
+            selectedTabIndex = selectedTabIndex,
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            tabbs.forEachIndexed { index, title ->
+                Tab(
+                    selected = selectedTabIndex == index,
+                    onClick = { onTabSelected(index) },
+                    text = {
+                        Text(
+                            title,
+                            fontSize = 12.sp,
+                            fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = Color.Gray
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            when (selectedTabIndex) {
+                0 -> NotesScreen(viewModel())
+                1 -> TaskScreen(viewModel())
+            }
+        }
+    }
+}
+
+@Composable
 fun HomeScreen(
     onNavigateToConvert: () -> Unit,
     onNavigateToCalculator: () -> Unit,
@@ -232,7 +274,7 @@ fun HomeScreen(
                 ) {
                     item { HomeButton("Unit Converter", Icons.Default.CurrencyExchange, onNavigateToConvert) }
                     item { HomeButton("Calculator", Icons.Default.Calculate, onNavigateToCalculator) }
-                    item { HomeButton("Notes", Icons.AutoMirrored.Filled.Notes, onNavigateToNotes) }
+                    item { HomeButton("Notes & Tasks", Icons.AutoMirrored.Filled.Notes, onNavigateToNotes) }
                     item { HomeButton("Timer & Stopwatch", Icons.Default.Timer, onNavigateToTimer) }
                 }
             } else {
@@ -244,7 +286,7 @@ fun HomeScreen(
                 ) {
                     HomeButton("Unit Converter", Icons.Default.CurrencyExchange, onNavigateToConvert)
                     HomeButton("Calculator", Icons.Default.Calculate, onNavigateToCalculator)
-                    HomeButton("Notes", Icons.AutoMirrored.Filled.Notes, onNavigateToNotes)
+                    HomeButton("Notes & Tasks", Icons.AutoMirrored.Filled.Notes, onNavigateToNotes)
                     HomeButton("Timer & Stopwatch", Icons.Default.Timer, onNavigateToTimer)
                 }
             }

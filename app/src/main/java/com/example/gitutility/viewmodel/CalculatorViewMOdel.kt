@@ -59,9 +59,11 @@ class CalculatorViewModel : ViewModel() {
 
             fun eat(charToEat: Char): Boolean {
                 while (ch == ' ') nextChar()
-                if (ch != charToEat) return false
-                nextChar()
-                return true
+                if (ch == charToEat) {
+                    nextChar()
+                    return true
+                }
+                return false
             }
 
             fun parse(): Double {
@@ -101,8 +103,8 @@ class CalculatorViewModel : ViewModel() {
                 if (eat('(')) {
                     x = parseExpression()
                     eat(')')
-                } else if (ch >= '0' && ch <= '9' || ch == '.') {
-                    while (ch >= '0' && ch <= '9' || ch == '.') nextChar()
+                } else if (ch in '0'..'9' || ch == '.') {
+                    while (ch in '0'..'9' || ch == '.') nextChar()
                     x = expr.substring(startPos, this.pos).toDouble()
                 } else {
                     throw RuntimeException("Unexpected: " + ch)

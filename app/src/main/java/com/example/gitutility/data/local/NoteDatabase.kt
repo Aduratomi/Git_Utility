@@ -5,9 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Note::class], version = 1)
+@Database(entities = [Note::class, Task::class], version = 3)
 abstract class NoteDatabase : RoomDatabase() {
     abstract val noteDao: NoteDao
+    abstract val taskDao: TaskDao
 
     companion object {
         const val DATABASE_NAME = "notes_db"
@@ -21,7 +22,9 @@ abstract class NoteDatabase : RoomDatabase() {
                     context.applicationContext,
                     NoteDatabase::class.java,
                     DATABASE_NAME
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
