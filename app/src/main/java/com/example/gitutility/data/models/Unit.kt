@@ -1,11 +1,17 @@
 package com.example.gitutility.data.models
 
+/**
+ * Unit is a simple data container for a measurement unit (e.g., Meter).
+ */
 data class Unit(
-    val id: String,
-    val label: String,
-    val symbol: String
+    val id: String,    // Short code like "kg"
+    val label: String, // Full name like "Kilogram"
+    val symbol: String // Symbol like "kg"
 )
 
+/**
+ * UnitType defines categories of units (Length, Weight, Volume).
+ */
 sealed class UnitType(val units: List<Unit>) {
     object Length : UnitType(
         listOf(
@@ -40,6 +46,10 @@ sealed class UnitType(val units: List<Unit>) {
     )
 }
 
+/**
+ * UnitConversions contains the math factors used to calculate conversions.
+ * Everything is relative to a base unit (e.g., 1 Meter, 1 Kilogram, 1 Liter).
+ */
 object UnitConversions {
     private val lengthConversions = mapOf(
         "m" to 1.0,
@@ -67,14 +77,20 @@ object UnitConversions {
         "cup" to 4.22675
     )
 
+    /**
+     * convert takes a number and its units and calculates the final result.
+     */
     fun convert(value: Double, fromUnit: String, toUnit: String, type: UnitType): Double {
+        // Pick the correct conversion map based on the category
         val conversions = when (type) {
             is UnitType.Length -> lengthConversions
             is UnitType.Weight -> weightConversions
             is UnitType.Volume -> volumeConversions
         }
 
+        // Convert the input value to the base unit first (e.g., convert feet to meters)
         val baseValue = value / (conversions[fromUnit] ?: 1.0)
+        // Then convert from the base unit to the final unit (e.g., convert meters to kilometers)
         return baseValue * (conversions[toUnit] ?: 1.0)
     }
 }

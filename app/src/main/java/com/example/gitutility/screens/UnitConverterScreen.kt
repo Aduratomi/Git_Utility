@@ -33,9 +33,13 @@ import com.example.gitutility.components.SwapCard
 import com.example.gitutility.data.models.UnitType
 import com.example.gitutility.viewmodel.UnitConverterViewModel
 
+/**
+ * UnitConverterScreen allows users to convert physical units like Length, Weight, and Volume.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UnitConverterScreen(viewModel: UnitConverterViewModel = viewModel()) {
+    // State to track if the category dropdown is open
     var typeExpanded by remember { mutableStateOf(false) }
 
     Column(
@@ -52,6 +56,7 @@ fun UnitConverterScreen(viewModel: UnitConverterViewModel = viewModel()) {
             color = MaterialTheme.colorScheme.onBackground
         )
 
+        // --- Category Selector ---
         GlassCard(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -83,6 +88,7 @@ fun UnitConverterScreen(viewModel: UnitConverterViewModel = viewModel()) {
                     expanded = typeExpanded,
                     onDismissRequest = { typeExpanded = false }
                 ) {
+                    // Populate the category dropdown list
                     listOf(UnitType.Length, UnitType.Weight, UnitType.Volume).forEach { type ->
                         DropdownMenuItem(
                             text = {
@@ -102,6 +108,7 @@ fun UnitConverterScreen(viewModel: UnitConverterViewModel = viewModel()) {
             }
         }
 
+        // --- Conversion Area ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -109,6 +116,7 @@ fun UnitConverterScreen(viewModel: UnitConverterViewModel = viewModel()) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Source Unit
             Column(modifier = Modifier.weight(1f)) {
                 ConversionCard(
                     label = "From",
@@ -126,8 +134,10 @@ fun UnitConverterScreen(viewModel: UnitConverterViewModel = viewModel()) {
                 )
             }
 
+            // Central Swap Button
             SwapCard { viewModel.swap() }
 
+            // Destination Unit
             Column(modifier = Modifier.weight(1f)) {
                 ConversionCard(
                     label = "To",
@@ -149,6 +159,9 @@ fun UnitConverterScreen(viewModel: UnitConverterViewModel = viewModel()) {
     }
 }
 
+/**
+ * Reusable dropdown component for selecting a specific unit (e.g., meters, miles).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UnitDropdown(

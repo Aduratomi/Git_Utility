@@ -24,8 +24,13 @@ import com.example.gitutility.viewmodel.TaskViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * TaskScreen allows users to manage a to-do list.
+ * Features include adding tasks, marking them as done, and setting reminders.
+ */
 @Composable
 fun TaskScreen(viewModel: TaskViewModel = viewModel()) {
+    // Reactively observe the list of tasks and dialog states from the ViewModel
     val tasks by viewModel.tasks.collectAsState()
     val isAddingTask by viewModel.isAddingTask.collectAsState()
     val editingTask by viewModel.editingTask.collectAsState()
@@ -36,6 +41,7 @@ fun TaskScreen(viewModel: TaskViewModel = viewModel()) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        // --- Header Section ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -49,6 +55,7 @@ fun TaskScreen(viewModel: TaskViewModel = viewModel()) {
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
+            // Add Task Button
             IconButton(
                 onClick = { viewModel.onAddTaskClick() },
                 modifier = Modifier
@@ -63,6 +70,7 @@ fun TaskScreen(viewModel: TaskViewModel = viewModel()) {
             }
         }
 
+        // --- Task List Section ---
         if (tasks.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -92,6 +100,7 @@ fun TaskScreen(viewModel: TaskViewModel = viewModel()) {
         }
     }
 
+    // --- Add Task Dialog ---
     if (isAddingTask) {
         TaskDialog(
             onDismiss = { viewModel.onDismissAddTask() },
@@ -99,6 +108,7 @@ fun TaskScreen(viewModel: TaskViewModel = viewModel()) {
         )
     }
 
+    // --- Edit Task Dialog ---
     editingTask?.let { task ->
         TaskDialog(
             initialTitle = task.title,
@@ -109,6 +119,9 @@ fun TaskScreen(viewModel: TaskViewModel = viewModel()) {
     }
 }
 
+/**
+ * Component for a single task row.
+ */
 @Composable
 fun TaskItem(
     task: Task,
@@ -130,19 +143,24 @@ fun TaskItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Checkbox to mark completion
             Checkbox(
                 checked = task.isCompleted,
                 onCheckedChange = { onToggle() }
             )
             
             Column(modifier = Modifier.weight(1f)) {
+                // Task description text
                 Text(
                     text = task.title,
                     modifier = Modifier.clickable { onEdit() },
                     fontSize = 18.sp,
+                    // Cross out text if the task is completed
                     textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None,
                     color = if (task.isCompleted) Color.Gray else MaterialTheme.colorScheme.onSurface
                 )
+                
+                // Show reminder date if one is set
                 if (task.reminderTimestamp != null) {
                     val sdf = SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault())
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -162,6 +180,7 @@ fun TaskItem(
                 }
             }
 
+            // Delete button
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.Delete,
@@ -173,6 +192,9 @@ fun TaskItem(
     }
 }
 
+/**
+ * Dialog for entering task details, including date and time selection for reminders.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskDialog(
@@ -187,6 +209,7 @@ fun TaskDialog(
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
 
+    // States for the native Material 3 Date and Time pickers
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = reminderTimestamp ?: System.currentTimeMillis()
     )
@@ -206,6 +229,7 @@ fun TaskDialog(
         title = { Text(if (initialTitle.isEmpty()) "Add Task" else "Edit Task") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // Description Input
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
@@ -213,6 +237,7 @@ fun TaskDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 
+                // Reminder status and set button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -232,6 +257,7 @@ fun TaskDialog(
                     }
                 }
                 
+                // Button to remove the reminder
                 if (reminderTimestamp != null) {
                     TextButton(onClick = { reminderTimestamp = null }) {
                         Text("Clear Reminder", color = Color.Red)
@@ -257,13 +283,14 @@ fun TaskDialog(
         }
     )
 
+    // Show Date Picker when requested
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
                     showDatePicker = false
-                    showTimePicker = true
+                    showTimePicker = true // Move to time selection after date
                 }) { Text("Next") }
             }
         ) {
@@ -271,6 +298,7 @@ fun TaskDialog(
         }
     }
 
+    // Show Time Picker when requested
     if (showTimePicker) {
         AlertDialog(
             onDismissRequest = { showTimePicker = false },

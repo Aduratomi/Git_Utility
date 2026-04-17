@@ -57,12 +57,16 @@ import com.example.gitutility.data.models.Currency
 import com.example.gitutility.data.models.CurrencyData
 import com.example.gitutility.viewmodel.CurrencyConverterViewModel
 
+/**
+ * CurrencyConverterScreen handles the UI for converting money between different global currencies.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencyConverterScreen(viewModel: CurrencyConverterViewModel = viewModel()) {
+    // Collect the UI state (loading, rates, etc.) from the ViewModel
     val uiState by viewModel.uiState.collectAsState()
     val availableCurrencies = uiState.availableCurrencies.ifEmpty {
-        CurrencyData.currencies
+        CurrencyData.currencies // Fallback to static list if API data isn't ready
     }
 
     Column(
@@ -79,6 +83,7 @@ fun CurrencyConverterScreen(viewModel: CurrencyConverterViewModel = viewModel())
             color = MaterialTheme.colorScheme.onBackground
         )
 
+        // Show a loading bar while we fetch the latest rates
         if (uiState.isLoading) {
             GlassCard(
                 modifier = Modifier
@@ -100,6 +105,7 @@ fun CurrencyConverterScreen(viewModel: CurrencyConverterViewModel = viewModel())
             }
         }
 
+        // Show error message if data fetch fails
         uiState.error?.let { error ->
             GlassCard(
                 modifier = Modifier
@@ -127,6 +133,7 @@ fun CurrencyConverterScreen(viewModel: CurrencyConverterViewModel = viewModel())
             }
         }
 
+        // --- Conversion Input Area ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -134,6 +141,7 @@ fun CurrencyConverterScreen(viewModel: CurrencyConverterViewModel = viewModel())
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Source Currency
             Column(modifier = Modifier.weight(1f)) {
                 ConversionCard(
                     label = "From",
@@ -152,8 +160,10 @@ fun CurrencyConverterScreen(viewModel: CurrencyConverterViewModel = viewModel())
                 )
             }
 
+            // Central Swap Button
             SwapCard { viewModel.swap() }
 
+            // Destination Currency
             Column(modifier = Modifier.weight(1f)) {
                 ConversionCard(
                     label = "To",
@@ -174,6 +184,7 @@ fun CurrencyConverterScreen(viewModel: CurrencyConverterViewModel = viewModel())
             }
         }
 
+        // --- Footer showing "Last Updated" info ---
         GlassCard(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -196,6 +207,7 @@ fun CurrencyConverterScreen(viewModel: CurrencyConverterViewModel = viewModel())
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+                // Badge showing if data is live or cached
                 Text(
                     if (uiState.isRealTime) "Live" else "Cached",
                     fontSize = 10.sp,
@@ -213,6 +225,9 @@ fun CurrencyConverterScreen(viewModel: CurrencyConverterViewModel = viewModel())
     }
 }
 
+/**
+ * Reusable component for choosing a currency from a searchable list.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencySelector(
@@ -225,6 +240,7 @@ fun CurrencySelector(
     var showSheet by remember { mutableStateOf(false) }
     val selectedCurrencyObj = currencies.find { it.code == selectedCurrency } ?: CurrencyData.fromCode(selectedCurrency)
 
+    // A read-only field that opens a bottom sheet when clicked
     OutlinedTextField(
         value = "${selectedCurrencyObj.symbol} $selectedCurrency",
         onValueChange = {},
@@ -260,6 +276,9 @@ fun CurrencySelector(
     }
 }
 
+/**
+ * The searchable bottom sheet for picking a currency.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencySelectionSheet(
@@ -271,6 +290,7 @@ fun CurrencySelectionSheet(
     var searchQuery by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
 
+    // Filter the list based on user search
     val filteredCurrencies = if (searchQuery.isEmpty()) {
         currencies
     } else {
@@ -312,6 +332,7 @@ fun CurrencySelectionSheet(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
+            // Search text field
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -337,6 +358,7 @@ fun CurrencySelectionSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Scrollable list of currencies
             LazyColumn(
                 modifier = Modifier.weight(1f)
             ) {
@@ -355,11 +377,15 @@ fun CurrencySelectionSheet(
         }
     }
 
+    // Automatically focus the keyboard when the sheet pops up
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
 }
 
+/**
+ * Single currency item in the search list.
+ */
 @Composable
 fun CurrencyItem(
     currency: Currency,
@@ -373,6 +399,7 @@ fun CurrencyItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // Icon circle showing the currency symbol
         Box(
             modifier = Modifier
                 .size(40.dp)

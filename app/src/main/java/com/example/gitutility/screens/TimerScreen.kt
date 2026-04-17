@@ -42,6 +42,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gitutility.viewmodel.TimerViewModel
 
+/**
+ * TimerScreen contains both a countdown Timer and a Stopwatch.
+ */
 @Composable
 fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -52,6 +55,7 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Switch between Timer and Stopwatch at the top
         TabRow(
             selectedTabIndex = selectedTab,
             containerColor = Color.Transparent,
@@ -73,6 +77,7 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Detect landscape or portrait to position the clock and controls
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
             val isLandscape = maxWidth > maxHeight
             val contentModifier = Modifier
@@ -80,6 +85,7 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
                 .verticalScroll(rememberScrollState())
 
             if (selectedTab == 0) {
+                // --- Timer View ---
                 if (isLandscape) {
                     Row(
                         modifier = contentModifier,
@@ -108,6 +114,7 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
                     }
                 }
             } else {
+                // --- Stopwatch View ---
                 if (isLandscape) {
                     Row(
                         modifier = contentModifier,
@@ -140,6 +147,9 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
     }
 }
 
+/**
+ * Animated circle that shows how much time is left on the timer.
+ */
 @Composable
 fun TimerProgressCircle(viewModel: TimerViewModel) {
     BoxWithConstraints {
@@ -150,11 +160,13 @@ fun TimerProgressCircle(viewModel: TimerViewModel) {
             0f
         }
         
+        // animateFloatAsState makes the progress transition smooth
         val animatedProgress by animateFloatAsState(targetValue = progress, label = "timer_progress")
         val activeColor = if (viewModel.isTimerRunning) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary
         val trackColor = Color.LightGray.copy(alpha = 0.3f)
 
         Box(contentAlignment = Alignment.Center, modifier = Modifier.size(size)) {
+            // Canvas is used for custom drawing (the circles)
             Canvas(modifier = Modifier.size(size * 0.9f)) {
                 drawCircle(
                     color = trackColor,
@@ -179,9 +191,13 @@ fun TimerProgressCircle(viewModel: TimerViewModel) {
     }
 }
 
+/**
+ * Start, Pause, and Preset buttons for the Timer.
+ */
 @Composable
 fun TimerControls(viewModel: TimerViewModel) {
     if (viewModel.timerTime == 0L && !viewModel.isTimerRunning) {
+        // Quick-set buttons for common durations
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -227,6 +243,9 @@ fun TimerControls(viewModel: TimerViewModel) {
     }
 }
 
+/**
+ * Large numeric display for the Stopwatch.
+ */
 @Composable
 fun StopwatchDisplay(viewModel: TimerViewModel) {
     BoxWithConstraints {
@@ -251,6 +270,9 @@ fun StopwatchDisplay(viewModel: TimerViewModel) {
     }
 }
 
+/**
+ * Start, Pause, and Reset buttons for the Stopwatch.
+ */
 @Composable
 fun StopwatchControls(viewModel: TimerViewModel) {
     Row(
@@ -286,6 +308,9 @@ fun StopwatchControls(viewModel: TimerViewModel) {
     }
 }
 
+/**
+ * Small circular button used to quickly set the timer duration.
+ */
 @Composable
 fun TimerSetButton(label: String, onClick: () -> Unit) {
     Surface(

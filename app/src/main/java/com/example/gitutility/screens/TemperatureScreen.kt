@@ -31,9 +31,13 @@ import com.example.gitutility.components.ConversionCard
 import com.example.gitutility.components.SwapCard
 import com.example.gitutility.viewmodel.TemperatureViewModel
 
+/**
+ * TemperatureScreen allows users to convert between Celsius, Fahrenheit, and Kelvin.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TemperatureScreen(viewModel: TemperatureViewModel = viewModel()) {
+    // List of units for the dropdown (Label and ID)
     val tempUnits = listOf("°C" to "C", "°F" to "F", "K" to "K")
 
     Column(
@@ -57,6 +61,7 @@ fun TemperatureScreen(viewModel: TemperatureViewModel = viewModel()) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Source side
             Column(modifier = Modifier.weight(1f)) {
                 ConversionCard(
                     label = "From",
@@ -74,8 +79,10 @@ fun TemperatureScreen(viewModel: TemperatureViewModel = viewModel()) {
                 )
             }
 
+            // Central Swap Button
             SwapCard { viewModel.swap() }
 
+            // Destination side
             Column(modifier = Modifier.weight(1f)) {
                 ConversionCard(
                     label = "To",
@@ -97,6 +104,9 @@ fun TemperatureScreen(viewModel: TemperatureViewModel = viewModel()) {
     }
 }
 
+/**
+ * Reusable dropdown component for selecting a temperature unit.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TempDropdown(

@@ -50,8 +50,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gitutility.data.local.Note
 import com.example.gitutility.viewmodel.NotesViewModel
 
+/**
+ * NotesScreen displays a list of personal notes.
+ * Users can add, edit, and delete notes from here.
+ */
 @Composable
 fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
+    // Collect the latest notes and dialog states from the ViewModel
     val notes by viewModel.notes.collectAsState()
     val isAddingNote by viewModel.isAddingNote.collectAsState()
     val editingNote by viewModel.editingNote.collectAsState()
@@ -61,6 +66,7 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        // --- Header ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -74,6 +80,7 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
+            // Add Note Button
             IconButton(
                 onClick = { viewModel.onAddNoteClick() },
                 modifier = Modifier
@@ -88,7 +95,9 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
             }
         }
 
+        // --- List of Notes ---
         if (notes.isEmpty()) {
+            // Show this if there are no notes yet
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -100,6 +109,7 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
                 )
             }
         } else {
+            // Show notes in a scrollable list
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 24.dp),
@@ -116,6 +126,7 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
         }
     }
 
+    // --- Add Note Dialog ---
     if (isAddingNote) {
         NoteDialog(
             onDismiss = { viewModel.onDismissDialog() },
@@ -125,6 +136,7 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
         )
     }
 
+    // --- Edit Note Dialog ---
     editingNote?.let { note ->
         NoteDialog(
             initialTitle = note.title,
@@ -137,6 +149,9 @@ fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
     }
 }
 
+/**
+ * Component for a single note card in the list.
+ */
 @Composable
 fun NoteCard(
     note: Note,
@@ -146,7 +161,7 @@ fun NoteCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .clickable { onClick() }, // Tapping the card opens the edit dialog
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
@@ -169,6 +184,7 @@ fun NoteCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
+                // Delete Icon
                 IconButton(
                     onClick = onDelete,
                     modifier = Modifier.size(24.dp)
@@ -193,6 +209,9 @@ fun NoteCard(
     }
 }
 
+/**
+ * Reusable dialog for adding or editing a note.
+ */
 @Composable
 fun NoteDialog(
     initialTitle: String = "",
@@ -205,7 +224,7 @@ fun NoteDialog(
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false) // Makes it full screen
     ) {
         Surface(
             modifier = Modifier
@@ -218,6 +237,7 @@ fun NoteDialog(
                     .fillMaxSize()
                     .padding(24.dp)
             ) {
+                // Toolbar in the dialog
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -244,6 +264,7 @@ fun NoteDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Title Input
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
@@ -264,6 +285,7 @@ fun NoteDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Content Input (expands to fill space)
                 OutlinedTextField(
                     value = content,
                     onValueChange = { content = it },

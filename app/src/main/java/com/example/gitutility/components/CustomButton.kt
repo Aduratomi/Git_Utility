@@ -14,23 +14,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/**
+ * CalculatorButton is a custom button for the calculator grid.
+ * It changes its color based on its role (Operator, Clear, or Number).
+ */
 @Composable
 fun CalculatorButton(
-    value: String,
-    onClick: () -> Unit,
+    value: String,           // The text to show on the button (e.g., "7" or "+")
+    onClick: () -> Unit,     // Function to run when the button is clicked
     modifier: Modifier = Modifier,
-    isOperator: Boolean = false,
-    isClear: Boolean = false,
-    isEquals: Boolean = false
+    isOperator: Boolean = false, // True for +, -, *, /
+    isClear: Boolean = false,    // True for C and backspace
+    isEquals: Boolean = false    // True for =
 ) {
     Box(
         modifier = modifier
             .background(
                 color = when {
-                    isEquals -> Color(0xFF4CAF50)
-                    isClear -> Color(0xFFf44336)
-                    isOperator -> MaterialTheme.colorScheme.primary
-                    else -> Color(0xFFEEEEEE)
+                    isEquals -> Color(0xFF4CAF50) // Green for result
+                    isClear -> Color(0xFFf44336)  // Red for reset
+                    isOperator -> MaterialTheme.colorScheme.primary // Brand color for operators
+                    else -> Color(0xFFEEEEEE)     // Gray for numbers
                 },
                 shape = RoundedCornerShape(12.dp)
             )
@@ -42,6 +46,7 @@ fun CalculatorButton(
             value,
             fontSize = 20.sp,
             color = when {
+                // Use white text for colored buttons, black for gray ones
                 isEquals || isClear || isOperator -> Color.White
                 else -> Color.Black
             }

@@ -28,12 +28,17 @@ import com.example.gitutility.components.CalculatorButton
 import com.example.gitutility.components.GlassCard
 import com.example.gitutility.viewmodel.CalculatorViewModel
 
+/**
+ * CalculatorScreen provides the user interface for our calculator.
+ * It uses an adaptive layout to work well on both portrait and landscape.
+ */
 @Composable
 fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val isLandscape = maxWidth > maxHeight
 
         if (isLandscape) {
+            // In landscape, we put the display and buttons side-by-side
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -59,6 +64,7 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
                 }
             }
         } else {
+            // In portrait, the display is on top and buttons are below
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -73,6 +79,9 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
     }
 }
 
+/**
+ * Reusable component for the calculator's numeric display.
+ */
 @Composable
 fun DisplayBox(display: String) {
     GlassCard(
@@ -87,10 +96,10 @@ fun DisplayBox(display: String) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp),
-            contentAlignment = Alignment.CenterEnd
+            contentAlignment = Alignment.CenterEnd // Align numbers to the right
         ) {
             Text(
-                text = display.ifEmpty { "0" },
+                text = display.ifEmpty { "0" }, // Show 0 if the formula is empty
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -101,8 +110,12 @@ fun DisplayBox(display: String) {
     }
 }
 
+/**
+ * The grid of buttons for the calculator.
+ */
 @Composable
 fun CalculatorButtonsGrid(viewModel: CalculatorViewModel) {
+    // Define the layout of our buttons
     val buttons = listOf(
         listOf("C", "⌫", "/", "×"),
         listOf("7", "8", "9", "−"),
@@ -112,7 +125,7 @@ fun CalculatorButtonsGrid(viewModel: CalculatorViewModel) {
     )
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         buttons.forEach { row ->
             Row(
@@ -120,11 +133,13 @@ fun CalculatorButtonsGrid(viewModel: CalculatorViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 row.forEach { btn ->
+                    // 0 and = buttons take up more space (weight)
                     val weight = if (btn == "0" || btn == "=") 0.5f else 0.25f
 
                     CalculatorButton(
                         value = btn,
                         onClick = {
+                            // Link each button to its logic in the ViewModel
                             when (btn) {
                                 "=" -> viewModel.calculate()
                                 "C" -> viewModel.clear()

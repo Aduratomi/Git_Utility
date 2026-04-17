@@ -25,12 +25,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/**
+ * ConversionCard is a reusable component for all our converters (Unit, Currency, Temp).
+ * It shows a label (e.g., "From") and a text field for entering a number.
+ */
 @Composable
 fun ConversionCard(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    readOnly: Boolean = false,
+    label: String,               // e.g., "From" or "To"
+    value: String,               // The current text inside the input
+    onValueChange: (String) -> Unit, // Function called when the user types
+    readOnly: Boolean = false,   // If true, the user can't type (used for results)
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     Column(
@@ -43,6 +47,7 @@ fun ConversionCard(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // Label at the top
         Text(
             label,
             fontSize = 12.sp,
@@ -50,8 +55,10 @@ fun ConversionCard(
             style = MaterialTheme.typography.labelSmall
         )
 
+        // Text input field
         OutlinedTextField(
             value = value,
+            // If readOnly, ignore typing attempts
             onValueChange = if (!readOnly) onValueChange else { {} },
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,6 +67,7 @@ fun ConversionCard(
                     shape = RoundedCornerShape(12.dp)
                 ),
             readOnly = readOnly,
+            // Shows the numeric keyboard with a decimal point
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             textStyle = androidx.compose.ui.text.TextStyle(
                 fontSize = 18.sp,
@@ -76,6 +84,9 @@ fun ConversionCard(
     }
 }
 
+/**
+ * SwapCard is a simple button that swaps the "From" and "To" values.
+ */
 @Composable
 fun SwapCard(onClick: () -> Unit) {
     Box(
@@ -89,7 +100,7 @@ fun SwapCard(onClick: () -> Unit) {
     ) {
         IconButton(onClick = onClick) {
             Icon(
-                imageVector = Icons.Default.SwapHoriz,
+                imageVector = Icons.Default.SwapHoriz, // The double-arrow icon
                 contentDescription = "Swap",
                 tint = Color.White
             )
